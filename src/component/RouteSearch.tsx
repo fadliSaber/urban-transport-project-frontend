@@ -12,105 +12,31 @@ const RouteSearch = () => {
 
 
     async function search(fromStop: string, toStop: string): Promise<Route[]> {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return [
-            {
-                id: "1",
-                routeNumber: "101",
-                name: "Route A",
-                stops: [
-                    {
-                        id: "1",
-                        name: "Station 1",
-                        coordinates: { lat: 40.712776, lng: -74.005974 },
-                    },
-                    {
-                        id: "2",
-                        name: "Station 2",
-                        coordinates: { lat: 40.713776, lng: -74.004974 },
-                    },
-                    {
-                        id: "3",
-                        name: "Station 3",
-                        coordinates: { lat: 40.714776, lng: -74.003974 },
-                    },
-                ],
-                frequency: "15 minutes",
-                duration: "30 minutes",
-            },
-            {
-                id: "2",
-                routeNumber: "102",
-                name: "Route B",
-                stops: [
-                    {
-                        id: "4",
-                        name: "Station 4",
-                        coordinates: { lat: 40.725776, lng: -74.020974 },
-                    },
-                    {
-                        id: "5",
-                        name: "Station 5",
-                        coordinates: { lat: 40.726776, lng: -74.019974 },
-                    },
-                    {
-                        id: "6",
-                        name: "Station 6",
-                        coordinates: { lat: 40.727776, lng: -74.018974 },
-                    },
-                ],
-                frequency: "20 minutes",
-                duration: "40 minutes",
-            },
-            {
-                id: "3",
-                routeNumber: "103",
-                name: "Route C",
-                stops: [
-                    {
-                        id: "7",
-                        name: "Station 7",
-                        coordinates: { lat: 40.735776, lng: -74.028974 },
-                    },
-                    {
-                        id: "8",
-                        name: "Station 8",
-                        coordinates: { lat: 40.736776, lng: -74.027974 },
-                    },
-                    {
-                        id: "9",
-                        name: "Station 9",
-                        coordinates: { lat: 40.737776, lng: -74.026974 },
-                    },
-                ],
-                frequency: "10 minutes",
-                duration: "20 minutes",
-            },
-            {
-                id: "4",
-                routeNumber: "104",
-                name: "Route D",
-                stops: [
-                    {
-                        id: "10",
-                        name: "Station 10",
-                        coordinates: { lat: 40.745776, lng: -74.035974 },
-                    },
-                    {
-                        id: "11",
-                        name: "Station 11",
-                        coordinates: { lat: 40.746776, lng: -74.034974 },
-                    },
-                    {
-                        id: "12",
-                        name: "Station 12",
-                        coordinates: { lat: 40.747776, lng: -74.033974 },
-                    },
-                ],
-                frequency: "25 minutes",
-                duration: "35 minutes",
-            },
-        ];
+        // Construct the URL with query parameters
+        const url = new URL('http://localhost:8080/route/search');
+        url.searchParams.append('fromStop', fromStop);
+        url.searchParams.append('toStop', toStop);
+
+        try {
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data: Route[] = await response.json();
+                console.log('Routes:', data);
+                return data;
+            } else {
+                console.error('Error: Failed to fetch routes');
+                return [];
+            }
+        } catch (error) {
+            console.error('Error fetching routes:', error);
+            return [];
+        }
     }
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -139,7 +65,7 @@ const RouteSearch = () => {
                             >
                                 <option value="">Select departure</option>
                                 {stops.map((stop) => (
-                                    <option key={stop.id} value={stop.id}>
+                                    <option key={stop.id} value={stop.name}>
                                         {stop.name}
                                     </option>
                                 ))}
@@ -162,7 +88,7 @@ const RouteSearch = () => {
                             >
                                 <option value="">Select destination</option>
                                 {stops.map((stop) => (
-                                    <option key={stop.id} value={stop.id}>
+                                    <option key={stop.id} value={stop.name}>
                                         {stop.name}
                                     </option>
                                 ))}
